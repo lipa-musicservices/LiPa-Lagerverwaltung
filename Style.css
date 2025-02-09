@@ -1,0 +1,9 @@
+.PageBackground {
+    background: linear-gradient(45deg, #dbdbdb, #7a7a7a);
+}
+
+.ElementTable{
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+}
