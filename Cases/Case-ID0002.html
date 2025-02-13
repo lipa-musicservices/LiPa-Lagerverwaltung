@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiPa Music Services - Cases-ID0002</title>
+    <link rel="stylesheet" href="/Style.css"></link>
+
+    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
+  </head>
+
+  <body onload="LoadWindow()" class="PageBackground">
+    <div class="CaseHeadline" id="ID0001">Koffer - ID0002</div>
+
+    <table width="100%" >
+        <tr>
+            <th width="10%">
+
+            </th>
+            <th width="80%">
+                <table width="100%">
+                    <tr class="ElementTable">
+                        <th width="33%" class="ElementTable">
+                            <div>Inhalt:</div>
+                            <div id="Content1">Ganz viele andere Kabel</div>
+                        </th> 
+                        <th width="34%" class="ElementTable">
+            
+                        </th> 
+                        <th width="33%" class="ElementTable">
+            
+                        </th> 
+                    </tr>
+                </table>
+            </th>
+            <th width="10%">
+
+            </th>
+        </tr>
+    </table>
+
+  </body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script
+
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous">
+
+</script>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+    function LoadWindow(){
+        sendMessage("https://script.google.com/macros/s/AKfycbzUjmivoorSk06NfdwALVW6h-f6o5pTz-zaN-NjzTDHv_vu8kUvJcR4yKhutpEM8FK5Bg/exec", "Cases/Case-ID0002");
+        fetchCSVFromDrive();
+    }
+</script>
+
+<script>
+
+    async function sendMessage(scriptUrl, message) {
+        const response = await fetch(`${scriptUrl}?message=${encodeURIComponent(message)}`);
+        console.log(await response.text()); // Erwartete Antwort: "OK" oder "Fehler"
+
+    }
+
+</script>
+
+<script>
+async function fetchCSVFromDrive() {
+    const url = "https://script.google.com/macros/s/AKfycbxdFCwNX2ldpefH0dyAoq-VhizW4B_LGO5rAtu-l1X4DegYDcJvgqJ4wCITZoy7mTSxyg/exec"; // Ersetze mit deinem Google Apps Script Link
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error("Fehler beim Abrufen der Datei");
+
+        const csvText = await response.text();
+
+        // CSV in ein strukturiertes Array umwandeln
+        const csvData = parseCSV(csvText);
+        console.log("Data: " + csvData);
+
+        WriteCSVToUI(csvData);
+
+    } catch (error) {
+        console.error("Fehler beim Laden der CSV-Datei:", error);
+    }
+}
+
+function parseCSV(csvText) {
+
+    searchText = "Cases-ID0002";
+    console.log("CSV-Raw Data:", csvText); // Debugging: CSV output
+
+    const rows = csvText.trim().split("\n").map(row => row.split(";")); // Change `;` to `,` if needed
+
+    if (rows.length === 0) return []; // If the file is empty
+
+    var element;
+
+    for (let i = 0; i < rows.length; i++) {
+        let Element = rows[i];
+        if(Element.includes("Case-ID0002")){
+            return Element;
+        }
+    }
+}
+</script>
+
+<script>
+    function WriteCSVToUI(Data){
+        console.log("Writing CSV to UI: " + Data);
+
+        document.getElementById("Content1").innerHTML = Data;
+    }
+</script>
