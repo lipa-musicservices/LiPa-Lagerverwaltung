@@ -100,7 +100,7 @@ function parseCSV(csvText) {
 
 <script>
     function MQTTConnectSend() {
-        const socket = new WebSocket("ws://192.168.0.15:80");
+        const socket = new WebSocket("wss://192.168.0.15:80");
 
     socket.onopen = () => {
         socket.send("Cases/Case-ID0001");
