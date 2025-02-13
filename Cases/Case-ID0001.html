@@ -102,8 +102,12 @@ function parseCSV(csvText) {
     function MQTTConnectSend() {
         const socket = new WebSocket("wss://192.168.0.15:80");
 
+        console.log("Connect to Socket: " + socket.url);
+
     socket.onopen = () => {
+        console.log("Socket open");
         socket.send("Cases/Case-ID0001");
+        console.log("Message sent");
     };
 
     socket.onmessage = (event) => {
