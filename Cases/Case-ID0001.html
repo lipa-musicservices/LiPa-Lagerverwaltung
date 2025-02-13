@@ -9,7 +9,7 @@
     <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
   </head>
 
-  <body onload="fetchCSVFromDrive()" class="PageBackground">
+  <body onload="LoadWindow()" class="PageBackground">
     <div class="CaseHeadline" id="ID0001">Koffer - ID0001</div>
 
     <table width="100%" >
@@ -55,6 +55,23 @@
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <script>
+    function LoadWindow(){
+        sendMessage("https://script.google.com/macros/s/AKfycbzUjmivoorSk06NfdwALVW6h-f6o5pTz-zaN-NjzTDHv_vu8kUvJcR4yKhutpEM8FK5Bg/exec", "Cases/Case-ID0001");
+        fetchCSVFromDrive();
+    }
+</script>
+
+<script>
+
+    async function sendMessage(scriptUrl, message) {
+        const response = await fetch(`${scriptUrl}?message=${encodeURIComponent(message)}`);
+        console.log(await response.text()); // Erwartete Antwort: "OK" oder "Fehler"
+
+    }
+
+</script>
+
+<script>
 async function fetchCSVFromDrive() {
     const url = "https://script.google.com/macros/s/AKfycbxdFCwNX2ldpefH0dyAoq-VhizW4B_LGO5rAtu-l1X4DegYDcJvgqJ4wCITZoy7mTSxyg/exec"; // Ersetze mit deinem Google Apps Script Link
 
@@ -74,8 +91,6 @@ async function fetchCSVFromDrive() {
     } catch (error) {
         console.error("Fehler beim Laden der CSV-Datei:", error);
     }
-
-    MQTTConnectSend();
 }
 
 function parseCSV(csvText) {
@@ -95,20 +110,6 @@ function parseCSV(csvText) {
             return Element;
         }
     }
-}
-</script>
-
-<script>
-    function MQTTConnectSend() {
-        const socket = new WebSocket("ws://192.168.0.15:5000");
-
-    socket.onopen = () => {
-        socket.send("Cases/Case-ID0001");
-    };
-
-    socket.onmessage = (event) => {
-        console.log("Cases/Case-ID0001", event.data);
-    };
 }
 </script>
 
