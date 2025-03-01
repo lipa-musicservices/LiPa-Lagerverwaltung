@@ -109,34 +109,17 @@ async function fetchCSVFromDrive() {
         const csvText = await response.text();
 
         // CSV in ein strukturiertes Array umwandeln
-        const csvData = parseCSV(csvText);
-        console.log("Data: " + csvData);
+        var csvData = csvText.trim().split("\n").map(row => row.split(";"));;
 
         WriteCSVToUI(csvData);
 
-    } catch (error) {
+    }
+    catch (error)
+    {
         console.error("Fehler beim Laden der CSV-Datei:", error);
     }
 }
 
-function parseCSV(csvText) {
-
-    searchText = "Cases-ID0001";
-    console.log("CSV-Raw Data:", csvText); // Debugging: CSV output
-
-    const rows = csvText.trim().split("\n").map(row => row.split(";")); // Change `;` to `,` if needed
-
-    if (rows.length === 0) return []; // If the file is empty
-
-    var element;
-
-    for (let i = 0; i < rows.length; i++) {
-        let Element = rows[i];
-        if(Element.includes("Case-ID0001")){
-            return Element;
-        }
-    }
-}
 </script>
 
 <script>
@@ -193,16 +176,18 @@ function parseCSV(csvText) {
             }
             else if(Data[i].includes("Cases - "))
             {
-                if(NewElementsCases.includes(Data[i].split('-')[1]))
+                let EleBuf = Data[i].toString().replace("Cases - ","");
+
+                if(NewElementsCases.includes(EleBuf))
                 {
-                    var Index = NewElementsCases.indexOf(Data[i].split('-')[1].trim());
+                    var Index = NewElementsCases.indexOf(EleBuf);
 
                     NewElementsCasesCount[Index] = +NewElementsCasesCount[Index] + 1;
                 }
                 else
                 {
-                    NewElementsCases.push(Data[i].split('-')[1].trim());
-                    NewElementsCases.push("1");
+                    NewElementsCases.push(EleBuf);
+                    NewElementsCasesCount.push("1");
                 }
             }
             else
@@ -298,12 +283,15 @@ function parseCSV(csvText) {
     }
 
 function FormatSizeString(){
-    
+
 }
+
 </script>
 
 <script>
     function WriteCSVToUI(Data){
+
+        var Name = "Case-ID0001";
 
         console.log("Writing CSV to UI: " + Data);
 
