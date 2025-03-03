@@ -32,11 +32,13 @@
                 <table width="100%" height="100%">
                     <tr class="ElementTableContentCell" height="100%">
                         <th width="33%" class="ElementTable">
-                            <div class="ElementCellHeader" id="ElementCellHeader">Inhalt:</div>
+                            <div class="ElementCellHeader" id="ElementCellHeader1">Inhalt:</div>
                             <div class="ElementCellContent" id="ElementCellContent">Loading...</div>
                         </th> 
                         <th width="34%" class="ElementTable">
-            
+                            <div class="ElementCellHeader" id="ElementCellHeader2">Inhalt:</div>
+                            <div class="ElementCellContent" id="ElementCellSize">Loading...</div>
+                            
                         </th> 
                         <th width="33%" height="100%" class="ElementTableNoBorder">
                             <a width="100%" height="100%" href="https://linktr.ee/lipa.musicservices" target="_blank"><img width="100%" height="100%" src="/Resources/ContactDesign.png" border="1px"></a>
@@ -282,8 +284,15 @@ async function fetchCSVFromDrive() {
         return ReturnString;
     }
 
-function FormatSizeString(){
+function FormatSizeString(Data)
+{
+    var SizeString = "";
 
+    SizeString += "H: " + Data[7] + " mm</br>";
+    SizeString += "B: " + Data[8] + " mm</br>";
+    SizeString += "T: " + Data[9] + " mm</br>";
+
+    return SizeString;
 }
 
 </script>
@@ -297,14 +306,33 @@ function FormatSizeString(){
 
         var DataArray = Data.toString().split(",");
 
-        document.getElementById("ElementID").innerHTML = DataArray[0];
-        document.getElementById("ElementName").innerHTML = DataArray[1];
-        document.getElementById("ElementPlace").innerHTML = "Lagerort:</br>" + DataArray[3];
-        
-        document.getElementById("ElementCellHeader").innerHTML = "Inhalt:";
+        let Elementtext = new Array();
 
-        document.getElementById("ElementCellContent").innerHTML = CombineElementsInData(DataArray);
-        document.getElementById("ElementCellSize").innerHTML = FormatSizeString(DataArray);
+        for(let i = 0; i < DataArray.length; i++)
+        {
+            if(DataArray[i].includes(Name) && DataArray[i].includes("#NEWCASEELEMENT#"))
+            {
+                var k = 1;
+
+                while(i < DataArray.length && !DataArray[i+k].includes("#NEWCASEELEMENT#"))
+                {
+                    Elementtext.push(DataArray[i].replace("#NEWCASEELEMENT#",""));
+
+                    k = 0;
+                    i++;
+                }
+            }
+        }
+
+        document.getElementById("ElementID").innerHTML = Elementtext[0];
+        document.getElementById("ElementName").innerHTML = Elementtext[1];
+        document.getElementById("ElementPlace").innerHTML = "Lagerort:</br>" + Elementtext[3];
+        
+        document.getElementById("ElementCellHeader1").innerHTML = "Inhalt:";
+        document.getElementById("ElementCellHeader2").innerHTML = "Größe:";
+
+        document.getElementById("ElementCellContent").innerHTML = CombineElementsInData(Elementtext);
+        document.getElementById("ElementCellSize").innerHTML = FormatSizeString(Elementtext);
 
     }
 </script>
