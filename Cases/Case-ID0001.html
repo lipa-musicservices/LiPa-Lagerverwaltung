@@ -160,7 +160,21 @@ async function fetchCSVFromDrive() {
             }
             else if(Data[i].includes("Instr - "))
             {
-                NewElementsInstr.push(Data[i].split('-')[1].trim());
+                var FullText = "";
+
+                if(Data[i].includes("#INSTRUMENTID#"))
+                {
+                    var LinkID = Data[i].toString().replace("#INSTRUMENTID#","#").split('#')[1];
+                    var Text = Data[i].toString().replace("#INSTRUMENTID#","#").split('#')[0].split('-')[1].trim();
+
+                    FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Instruments/" + LinkID + ".html\">> zur Instrumenten-Seite</a>";
+                }
+                else
+                {
+                    FullText = Data[i].split('-')[1];
+                }
+
+                NewElementsInstr.push(FullText);
             }
             else if(Data[i].includes("Equip - "))
             {
@@ -172,7 +186,21 @@ async function fetchCSVFromDrive() {
                 }
                 else
                 {
-                    NewElementsEquip.push(Data[i].split('-')[1].trim());
+                    var FullText = "";
+
+                    if(Data[i].includes("#EQUIPMENTID#"))
+                    {
+                        var LinkID = Data[i].toString().replace("#EQUIPMENTID#","#").split('#')[1];
+                        var Text = Data[i].toString().replace("#EQUIPMENTID#","#").split('#')[0].split('-')[1].trim();
+
+                        FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Equipment/" + LinkID + ".html\">> zur Equipment-Seite</a>";
+                    }
+                    else
+                    {
+                        FullText = Data[i].split('-')[1];
+                    }
+
+                    NewElementsEquip.push(FullText);
                     NewElementsEquipCount.push("1");
                 }
             }
@@ -235,7 +263,14 @@ async function fetchCSVFromDrive() {
 
             for(let i = 0; i < NewElementsEquip.length; i++)
             {
-                ReturnString += "- " + NewElementsEquipCount[i] + "x " + NewElementsEquip[i] + "</br>";
+                if(NewElementsEquip[i].includes("</br><a href=\"../Equipment/"))
+                {
+                    ReturnString += "- " + NewElementsEquip[i] + "</br>";
+                }
+                else
+                {
+                    ReturnString += "- " + NewElementsEquipCount[i] + "x " + NewElementsEquip[i] + "</br>";
+                }
             }
         }
 
