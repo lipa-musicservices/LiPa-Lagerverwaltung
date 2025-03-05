@@ -20,6 +20,16 @@
                     <tr class="ElementTable">
                         <th width="33%" class="ElementHeaderL">
                             <div id="ElementID">Loading...</div>
+                            <table width="100%">
+                                <tr width="100%">
+                                    <th width="70%">
+                                        <input id="PasswordFieldID" class="PasswordField" width="100%" type="password">
+                                    </th>
+                                    <th width="30%">
+                                        <button id="PasswordButtonID" class="PasswordButton" onclick="PasswordEnterBtnClick()" type="button">Enter</button>
+                                    </th>
+                                </tr>
+                            </table>
                         </th> 
                         <th width="34%" class="ElementHeaderM">
                             <div id="ElementName">Loading...</div>
@@ -41,7 +51,7 @@
                             
                         </th> 
                         <th width="33%" height="100%" class="ElementTableNoBorder">
-                            <a width="100%" height="100%" href="https://linktr.ee/lipa.musicservices" target="_blank"><img width="100%" height="100%" src="/Resources/ContactDesign.png" border="1px"></a>
+                            <a width="100%" height="100%" href="https://linktr.ee/lipa.musicservices" target="_blank"><img width="100%" height="100%" src="/Resources/ContactDesign.png"></a>
                         </th> 
                     </tr>
                 </table>
@@ -55,6 +65,10 @@
   </body>
 </html>
 
+<script>
+    var Password = "";
+    var Elementtext = new Array();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script
@@ -66,6 +80,24 @@
 </script>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+
+    function PasswordEnterBtnClick()
+    {
+        var EnteredPassword = document.getElementById("PasswordFieldID").innerHTML;
+
+        if(EnteredPassword == Password)
+        {
+            WriteCSVToUI();
+        }
+        else
+        {
+
+        }
+    }
+
+</script>
 
 <script>
 
@@ -113,8 +145,46 @@ async function fetchCSVFromDrive() {
         // CSV in ein strukturiertes Array umwandeln
         var csvData = csvText.trim().split("\n").map(row => row.split(";"));;
 
-        WriteCSVToUI(csvData);
 
+        var Name = "Case-ID0001";
+
+        console.log("Writing CSV to UI: " + csvData);
+
+        var DataArray = csvData.toString().split(",");
+
+        for(let i = 0; i < DataArray.length; i++)
+        {
+            if(DataArray[i].includes(Name) && DataArray[i].includes("#NEWCASEELEMENT#"))
+            {
+                var k = 1;
+
+                while(i < DataArray.length && !DataArray[i+k].includes("#NEWCASEELEMENT#"))
+                {
+                    Elementtext.push(DataArray[i].replace("#NEWCASEELEMENT#",""));
+
+                    k = 0;
+                    i++;
+                }
+            }
+        }
+
+        document.getElementById("ElementID").innerHTML = Elementtext[0];
+        document.getElementById("ElementName").innerHTML = Elementtext[1];
+        document.getElementById("ElementPlace").innerHTML = "Lagerort:</br>" + Elementtext[3];
+        
+        document.getElementById("ElementCellHeader1").innerHTML = "Inhalt:";
+        document.getElementById("ElementCellHeader2").innerHTML = "Größe:";
+
+        document.getElementById("ElementCellSize").innerHTML = FormatSizeString(Elementtext);
+
+        if(Elementtext[12].trim() == "")
+        {
+            WriteCSVToUI();
+        }
+        else
+        {
+            document.getElementById("ElementCellContent").innerHTML = "Die Inhalte dieses Cases sind passwortgeschützt!"
+        }
     }
     catch (error)
     {
@@ -142,7 +212,7 @@ async function fetchCSVFromDrive() {
         let NewElementsGeneral = new Array();
         let NewElementsGeneralCount = new Array();
 
-        for (let i = 12; i < Data.length; i++)
+        for (let i = 14; i < Data.length; i++)
         {
             if(Data[i].includes("Cable - "))
             {
@@ -167,7 +237,7 @@ async function fetchCSVFromDrive() {
                     var LinkID = Data[i].toString().replace("#INSTRUMENTID#","#").split('#')[1];
                     var Text = Data[i].toString().replace("#INSTRUMENTID#","#").split('#')[0].split('-')[1].trim();
 
-                    FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Instruments/" + LinkID + ".html\">> zur Instrumenten-Seite</a>";
+                    FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Instruments/" + LinkID + ".html\" target=\"_blank\">> zur Instrumenten-Seite</a>";
                 }
                 else
                 {
@@ -193,7 +263,7 @@ async function fetchCSVFromDrive() {
                         var LinkID = Data[i].toString().replace("#EQUIPMENTID#","#").split('#')[1];
                         var Text = Data[i].toString().replace("#EQUIPMENTID#","#").split('#')[0].split('-')[1].trim();
 
-                        FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Equipment/" + LinkID + ".html\">> zur Equipment-Seite</a>";
+                        FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Equipment/" + LinkID + ".html\" target=\"_blank\">> zur Equipment-Seite</a>";
                     }
                     else
                     {
@@ -206,19 +276,12 @@ async function fetchCSVFromDrive() {
             }
             else if(Data[i].includes("Cases - "))
             {
-                let EleBuf = Data[i].toString().replace("Cases - ","");
+                var Text = Data[i].toString().replace("Cases - ","");
 
-                if(NewElementsCases.includes(EleBuf))
-                {
-                    var Index = NewElementsCases.indexOf(EleBuf);
-
-                    NewElementsCasesCount[Index] = +NewElementsCasesCount[Index] + 1;
-                }
-                else
-                {
-                    NewElementsCases.push(EleBuf);
-                    NewElementsCasesCount.push("1");
-                }
+                var FullText = Text + "</br>&nbsp&nbsp&nbsp&nbsp&nbsp<a class=\"ContentLinkClass\" href=\"../Cases/" + Data[i].toString().replace("Cases - ","") + ".html\" target=\"_blank\">> zur Case-Seite</a>";
+                
+                NewElementsCases.push(FullText);
+                NewElementsCasesCount.push("1");
             }
             else
             {
@@ -333,38 +396,7 @@ function FormatSizeString(Data)
 </script>
 
 <script>
-    function WriteCSVToUI(Data){
-
-        var Name = "Case-ID0001";
-
-        console.log("Writing CSV to UI: " + Data);
-
-        var DataArray = Data.toString().split(",");
-
-        let Elementtext = new Array();
-
-        for(let i = 0; i < DataArray.length; i++)
-        {
-            if(DataArray[i].includes(Name) && DataArray[i].includes("#NEWCASEELEMENT#"))
-            {
-                var k = 1;
-
-                while(i < DataArray.length && !DataArray[i+k].includes("#NEWCASEELEMENT#"))
-                {
-                    Elementtext.push(DataArray[i].replace("#NEWCASEELEMENT#",""));
-
-                    k = 0;
-                    i++;
-                }
-            }
-        }
-
-        document.getElementById("ElementID").innerHTML = Elementtext[0];
-        document.getElementById("ElementName").innerHTML = Elementtext[1];
-        document.getElementById("ElementPlace").innerHTML = "Lagerort:</br>" + Elementtext[3];
-        
-        document.getElementById("ElementCellHeader1").innerHTML = "Inhalt:";
-        document.getElementById("ElementCellHeader2").innerHTML = "Größe:";
+    function WriteCSVToUI(){
 
         document.getElementById("ElementCellContent").innerHTML = CombineElementsInData(Elementtext);
         document.getElementById("ElementCellSize").innerHTML = FormatSizeString(Elementtext);
